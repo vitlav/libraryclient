@@ -1,0 +1,120 @@
+package org.sergy.libclient.utils;
+
+import org.sergy.libclient.model.Author;
+
+import android.content.Context;
+import android.database.Cursor;
+import android.database.SQLException;
+import android.database.sqlite.SQLiteDatabase;
+import android.os.Environment;
+import android.util.Log;
+
+public class DBManager {
+
+	//Public keys
+	public static final String AUTHOR_SEARCH_NAME = "name";
+	public static final String AUTHOR_SEARCH_ID = "_id";
+	
+	public static final String BOOK_SEARCH_ID = "_id";
+	public static final String BOOK_SEARCH_SIZE = "size";
+	public static final String BOOK_SEARCH_TITLE = "title";
+	public static final String BOOK_SEARCH_LANG = "lang";
+	public static final String BOOK_SEARCH_FORMAT = "format";
+
+	//Queries
+	private static final String AUTHOR_SEARCH_QUERY = "select (FirstName || ' ' || LastName) as " + AUTHOR_SEARCH_NAME + ", AvtorId as " + AUTHOR_SEARCH_ID + " from libavtorname an where FirstName like ? and LastName like ? and (select count(*) from libbook b join libavtor a on b.BookId=a.BookId where b.Deleted<>0 and b.Blocked<>0 and b.Broken<>0 and a.AvtorId=an.AvtorId) > 0 limit 30";
+	private static final String BOOK_SEARCH_BY_AUTHOR_ID_QUERY = "select b.BookId " + BOOK_SEARCH_ID + ", b.FileSize " + BOOK_SEARCH_SIZE + ", b.Title " + BOOK_SEARCH_TITLE + ", b.Lang " + BOOK_SEARCH_LANG + ", b.FileType " + BOOK_SEARCH_FORMAT + " from libbook b join libavtor a on b.BookId=a.BookId where b.Deleted<>1 and b.Blocked<>1 and b.Broken<>1 and a.AvtorId=";
+	
+	
+    private SQLiteDatabase mDb;
+    
+
+    private static final String DATABASE_PATH = Environment.getExternalStorageDirectory() + "/lib.db";
+
+
+    /**
+     * Constructor - takes the context to allow the database to be
+     * opened/created
+     * 
+     * @param ctx the Context within which to work
+     */
+    public  DBManager(Context ctx) {
+    }
+
+    /**
+     * Open the lib database.
+     * 
+     * @return this (self reference, allowing this to be chained in an
+     *         initialization call)
+     * @throws SQLException if the database could be opened
+     */
+    public DBManager open() throws SQLException {
+        mDb = SQLiteDatabase.openDatabase(DATABASE_PATH, null, SQLiteDatabase.OPEN_READONLY | SQLiteDatabase.NO_LOCALIZED_COLLATORS);
+        return this;
+    }
+    
+    public void close() {
+        mDb.close();
+    }
+
+    /**
+     * Search authors by Author.FirstName and Author.LastName<br/>
+     * this query have maximum result LIMIT
+     * @param author filled <code>Author</code> object for search
+     * @return 
+     */
+    public Cursor getAuthors(Author author) {
+    	try {
+    		if (author != null) {
+    			Cursor cursor = mDb.rawQuery(AUTHOR_SEARCH_QUERY, new String[] {prepareLIKECondition(author.getFirstName()), prepareLIKECondition(author.getLastName())});
+    			return cursor;
+    		}
+    	} catch (Exception e) {
+    		Log.e(this.getClass().toString(), e.getClass().toString() + ": " + e.getMessage());
+		}
+    	
+    	return null;
+    	
+    }
+    
+    public Cursor getBooksByAuthorId(long authorId) {
+    	String query = BOOK_SEARCH_BY_AUTHOR_ID_QUERY + String.valueOf(authorId);
+    	try {
+    		Cursor cursor = mDb.rawQuery(query, null);
+    		return cursor;
+    	} catch (Exception e) {
+    		Log.e(this.getClass().toString(), e.getClass().toString() + ": " + e.getMessage());
+		}
+    	return null;
+    }
+    
+    /**
+     * Prepares string for using in LIKE sql condition
+     * @param str
+     * @return
+     */
+    private String prepareLIKECondition(String str) {
+    	String result = "%";
+    	
+    	if (str != null && !"".equals(str)) {
+    		result += str.trim().replace('*', '%').replace("'", "''") + "%"; 
+    	}
+    	
+    	return result;
+    }
+    
+    public int getBooksNumber() {
+    	int result = -1;
+    	
+    	String sql = "select count(*) from libavtor";
+    	
+    	Cursor cursor = mDb.rawQuery(sql, null);
+    	
+    	if (cursor.moveToFirst()) {
+    		result = cursor.getInt(0);
+    	}
+    	return result;
+    }
+    
+
+}
