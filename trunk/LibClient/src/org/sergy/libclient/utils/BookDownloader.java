@@ -10,6 +10,12 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.w3c.dom.Entity;
+
 import android.os.Environment;
 
 public class BookDownloader {
@@ -30,9 +36,14 @@ public class BookDownloader {
 			URL httpUrl = new URL(url);
 			HttpURLConnection.setFollowRedirects(true);
 			connection = (HttpURLConnection)httpUrl.openConnection();
-//			connection.setInstanceFollowRedirects(true);
+			connection.setInstanceFollowRedirects(true);
 			//connection.setRequestMethod("GET");
 			connection.connect();
+			int resopnseCode = connection.getResponseCode();
+			/*HttpGet httpGet = new HttpGet(url);
+			DefaultHttpClient client = new DefaultHttpClient();
+			HttpResponse response = client.execute(httpGet);
+			HttpEntity entity = response.getEntity();*/
 			String fname  = getFileName(connection.getURL().toString());
 			String ext = getFileExtension(fname);
 			int size = connection.getContentLength();
@@ -81,7 +92,7 @@ public class BookDownloader {
 	 * @return
 	 */
 	private String getFileName(String path) {
-		return path != null ? path.substring(path.lastIndexOf('/')) : null;
+		return path != null ? path.substring(path.lastIndexOf('/') + 1) : null;
 	}
 	
 	/**
@@ -90,6 +101,6 @@ public class BookDownloader {
 	 * @return
 	 */
 	private String getFileExtension(String fname) {
-		return fname != null ? fname.substring(fname.lastIndexOf(".")) : null;
+		return fname != null ? fname.substring(fname.lastIndexOf(".") + 1) : null;
 	}
 }
