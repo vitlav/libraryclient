@@ -1,0 +1,9 @@
+#summary README
+
+= Installation =
+1. Download and unpack [http://libraryclient.googlecode.com/files/lib.db.tar.bz2]
+2. Put lib.db on the root of your external storage folder (/sdcard/)
+3. Download and install application
+4. Run it!
+
+PS. [http://code.google.com/p/android/issues/detail?id=4101] через цю багу при інсталяції Android попереджає про доступ до Phone calls
