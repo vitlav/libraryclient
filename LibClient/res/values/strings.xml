@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="fname">First name:</string>
+    <string name="lname">Last name:</string>
+    <string name="search">Search</string>
+    <string name="app_name">LibRusEcClient</string>
+    <string name="author_search_dialog">Insert at least one search parameter</string>
+    <string name="ok">OK</string>
+    <string name="no_query_alert">Empty query!</string>
+    <string name="no_author">Author not found!</string>
+    <string name="searching">Searching!</string>
+    <string name="search_query">Search query: </string>
+    <string name="results_count">Results count: </string>
+    <string name="book_header">Author: </string>
+    <string name="books_found">Books found: </string>
+    <string name="loading">Loading!</string>
+    <string name="book_lang">Language: </string>
+    <string name="book_format">Format: </string>
+    <string name="book_size">Size: </string>
+</resources>
