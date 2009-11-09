@@ -8,27 +8,45 @@ import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.net.URLConnection;
 
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpResponse;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.DefaultHttpClient;
-import org.w3c.dom.Entity;
-
+import android.os.Bundle;
 import android.os.Environment;
+import android.os.Handler;
+import android.os.Message;
 
-public class BookDownloader {
+public class BookDownloader extends Thread {
+	public final static String KEY_SIZE = "size";
+	public final static String KEY_STATE = "state";
+	public final static String KEY_CURRENT = "current";
+	public final static String KEY_MESSAGE = "message";
+	
+	public final static int CONNECTING = 0;
+	public final static int DOWLOADING = 1;
+	public final static int FINISHED = 2;
+	public final static int ERROR = 3;
+	public final static int ERROR_BAD_FILE_RETURNED = 4;
+	public final static int ERROR_RESPONSE_CODE = 5;
+	
+	
+	
+	private final static int BUF_SIZE = 1024 * 10; //kb
 	private final static String LIB_URL = "http://lib.rus.ec/b/";
 	private final static String DIR = "Books";
 	private final static String EXTENSION = "zip";
+	private final static int SLEEP_ON_ERROR = 2000;
 	
-	public void downloadBook(long id, String format) throws IOException {
-		String url = LIB_URL + String.valueOf(id) + "/" + format;
-		download(url);
+	private String url;
+	private Handler handler;
+	
+	public BookDownloader(long id, String format, Handler handler) throws IOException {
+		url = LIB_URL + String.valueOf(id) + "/" + format;
+		this.handler=handler;
 	}
 	
-	private void download(String url) throws IOException {
+	@Override
+	public void run() {
+		sendMessage(CONNECTING, "", 0, -1);
+		
 		BufferedInputStream in = null;
 		BufferedOutputStream bout = null;
 		HttpURLConnection connection = null;
@@ -37,53 +55,94 @@ public class BookDownloader {
 			HttpURLConnection.setFollowRedirects(true);
 			connection = (HttpURLConnection)httpUrl.openConnection();
 			connection.setInstanceFollowRedirects(true);
-			//connection.setRequestMethod("GET");
 			connection.connect();
 			int resopnseCode = connection.getResponseCode();
-			/*HttpGet httpGet = new HttpGet(url);
-			DefaultHttpClient client = new DefaultHttpClient();
-			HttpResponse response = client.execute(httpGet);
-			HttpEntity entity = response.getEntity();*/
-			String fname  = getFileName(connection.getURL().toString());
-			String ext = getFileExtension(fname);
-			int size = connection.getContentLength();
-			File root = Environment.getExternalStorageDirectory();
-			in = new BufferedInputStream(connection.getInputStream());
 			
-			if (root.canWrite() && EXTENSION.equalsIgnoreCase(ext)) {
-				File dir = new File(root, DIR);
-				dir.mkdirs();
-				File file = new File(dir, fname);
-				FileOutputStream fos = new FileOutputStream(file);
-				bout = new BufferedOutputStream(fos,1024);
+			if (resopnseCode == HttpURLConnection.HTTP_OK) {
+				String fname  = getFileName(connection.getURL().toString());
+				String ext = getFileExtension(fname);
+				int size = connection.getContentLength();
+				File root = Environment.getExternalStorageDirectory();
+				in = new BufferedInputStream(connection.getInputStream());
 				
-				byte data[] = new byte[1024];
-				while(in.read(data,0,1024)>=0) {
-					bout.write(data);
+				if (EXTENSION.equalsIgnoreCase(ext)) {
+					File dir = new File(root, DIR);
+					dir.mkdirs();
+					File file = new File(dir, fname);
+					FileOutputStream fos = new FileOutputStream(file);
+
+					bout = new BufferedOutputStream(fos, BUF_SIZE);
+					byte data[] = new byte[BUF_SIZE];
+					int total = 0;
+					int current = 0;
+					
+					sendMessage(DOWLOADING, fname, size, total);
+					
+					while((current = in.read(data,0,BUF_SIZE)) >=0) {
+						bout.write(data);
+						
+						total += current;
+						sendMessage(DOWLOADING, fname, size, total);
+					}
+					
+				} else {
+					sendMessage(ERROR_BAD_FILE_RETURNED, fname, 0, -1);
+					sleep(SLEEP_ON_ERROR);
 				}
-				
+			} else {
+				sendMessage(ERROR_RESPONSE_CODE, connection.getResponseMessage(), 0, -1);
+				sleep(SLEEP_ON_ERROR);
 			}
 					
 		} catch (MalformedURLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			sendExceptionMessage(e);
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			sendExceptionMessage(e);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}finally {
 			if (bout != null) {
-				bout.close();
+				try {
+					bout.close();
+				} catch (IOException e) {
+					sendExceptionMessage(e);
+				}
 			}
 			if (in != null) {
-				in.close();
+				try {
+					in.close();
+				} catch (IOException e) {
+					sendExceptionMessage(e);
+				}
 			}
+			
+			sendMessage(FINISHED, "", 0, -1);
 			if (connection != null) {
 				connection.disconnect();
 			}
+			
+			
 		}
 		
+	}
+	
+	private void sendExceptionMessage(Exception e) {
+		sendMessage(ERROR, e.getClass() + ":" + e.getMessage(), 0, -1);
+		try {
+			sleep(SLEEP_ON_ERROR);
+		} catch (InterruptedException e1) {
+		}
+	}
+	
+	private void sendMessage(int state, String message, int size, int current) {
+		Message msg = handler.obtainMessage();
+        Bundle b = new Bundle();
+        b.putInt(KEY_STATE, state);
+        b.putString(KEY_MESSAGE, message);
+        b.putInt(KEY_SIZE, size);
+        b.putInt(KEY_CURRENT, current);
+        msg.setData(b);
+        handler.sendMessage(msg);
 	}
 	
 	/**

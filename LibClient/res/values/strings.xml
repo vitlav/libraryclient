@@ -17,4 +17,10 @@
     <string name="book_lang">Language: </string>
     <string name="book_format">Format: </string>
     <string name="book_size">Size: </string>
+    <string name="download_connecting">Connecting...</string>
+    <string name="download_downloading">Dowloading file: </string>
+    <string name="download_finished">Download finished!</string>
+    <string name="download_error">Catched exception: </string>
+    <string name="download_error_response">Bad server response: </string>
+    <string name="download_error_bad_book">Incorrect file name from server: </string>
 </resources>

@@ -6,10 +6,13 @@ import org.sergy.libclient.model.Author;
 import org.sergy.libclient.utils.BookDownloader;
 import org.sergy.libclient.utils.DBManager;
 
+import android.app.Dialog;
+import android.app.ProgressDialog;
 import android.content.res.Configuration;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Message;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
@@ -20,12 +23,16 @@ import android.widget.TextView;
 import android.widget.AdapterView.OnItemClickListener;
 
 public class BookList extends AbstractListActivity {
+	static final int PROGRESS_DIALOG = 0;
+
 	private Author author;
 	private ListView bookList;
 	private DBManager dbm;
 	private int count;
 	private Cursor cursor;
 	private Handler handler;
+	
+	private ProgressDialog progressDialog;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -101,6 +108,19 @@ public class BookList extends AbstractListActivity {
 		super.onConfigurationChanged(newConfig);
 	}
 	
+	@Override
+	protected Dialog onCreateDialog(int id) {
+		switch (id) {
+		case PROGRESS_DIALOG:
+			progressDialog = new ProgressDialog(this);
+			progressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+			progressDialog.setMessage("Starting");
+			return progressDialog;
+		default:
+			return null;
+		}
+	}
+	
 	/**
 	 * Set books count in IU. Invoke after search() method
 	 */
@@ -155,16 +175,64 @@ public class BookList extends AbstractListActivity {
 
 		@Override
 		public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-			BookDownloader bookDownloader = new BookDownloader();
 			LinearLayout layout = (LinearLayout)view;
 			TextView format = (TextView)layout.findViewById(R.id.book_format);
 			try {
-				bookDownloader.downloadBook(id, format.getText().toString());
+				BookDownloader bookDownloader = new BookDownloader(id, format.getText().toString(), downloadHandler);
+				showDialog(BookList.PROGRESS_DIALOG);
+				bookDownloader.start();
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
 		}
 		
 	}
+	
+	// Define the Handler that receives messages from the thread and update the progress
+    final Handler downloadHandler = new Handler() {
+        public void handleMessage(Message msg) {
+        	Bundle b = msg.getData();
+            int max = b.getInt(BookDownloader.KEY_SIZE);
+            int current = b.getInt(BookDownloader.KEY_CURRENT);
+            int state = b.getInt(BookDownloader.KEY_STATE);
+            String message = b.getString(BookDownloader.KEY_MESSAGE);
+            
+            switch (state) {
+			case BookDownloader.CONNECTING:
+				updateProgressBar(getString(R.string.download_connecting), max, current);
+				break;
+			case BookDownloader.DOWLOADING:
+				updateProgressBar(getString(R.string.download_downloading) + message, max, current);
+				break;
+			case BookDownloader.FINISHED:
+				updateProgressBar(getString(R.string.download_finished) + message, max, current);
+				try {
+						Thread.sleep(1000);
+					} catch (InterruptedException e) {
+					}
+				dismissDialog(PROGRESS_DIALOG);
+				break;
+			case BookDownloader.ERROR:
+				updateProgressBar(getString(R.string.download_error) + message, max, current);
+				break;
+			case BookDownloader.ERROR_BAD_FILE_RETURNED:
+				updateProgressBar(getString(R.string.download_error_bad_book) + message, max, current);
+				break;
+			case BookDownloader.ERROR_RESPONSE_CODE:
+				updateProgressBar(getString(R.string.download_error_response) + message, max, current);
+				break;
+			default:
+				break;
+			}
+        }
+        
+        private void updateProgressBar(String message, int max, int current) {
+        	progressDialog.setMessage(message);
+        	progressDialog.setMax(max);
+        	progressDialog.setProgress(current);
+        }
+        
+    };
+
 	
 }
