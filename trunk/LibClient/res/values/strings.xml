@@ -24,4 +24,6 @@
     <string name="download_error_response">Bad server response: </string>
     <string name="download_error_bad_book">Incorrect file name from server: </string>
     <string name="search_note">Note: search is case sensitive</string>
+    <string name="search_limit_note">Maximum result count: </string>
+    <string name="author_search_limit">50</string>
 </resources>

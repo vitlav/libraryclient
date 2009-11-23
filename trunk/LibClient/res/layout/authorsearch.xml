@@ -50,4 +50,20 @@
 		android:layout_width="wrap_content"
 		android:layout_height="wrap_content"
 		/>
+	<LinearLayout
+    	android:orientation="horizontal"
+    	android:layout_width="fill_parent"
+    	android:layout_height="wrap_content"
+    >
+    	<TextView
+			android:text="@string/search_limit_note"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			/>
+		<TextView
+			android:text="@string/author_search_limit"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			/>
+    </LinearLayout>
 </LinearLayout>
