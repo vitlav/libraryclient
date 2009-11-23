@@ -1,5 +1,6 @@
 package org.sergy.libclient.utils;
 
+import org.sergy.libclient.activities.R;
 import org.sergy.libclient.model.Author;
 
 import android.content.Context;
@@ -22,12 +23,12 @@ public class DBManager {
 	public static final String BOOK_SEARCH_FORMAT = "format";
 
 	//Queries
-	private static final String AUTHOR_SEARCH_QUERY = "select (FirstName || ' ' || LastName) as " + AUTHOR_SEARCH_NAME + ", AvtorId as " + AUTHOR_SEARCH_ID + " from libavtorname an where FirstName like ? and LastName like ? and (select count(*) from libbook b join libavtor a on b.BookId=a.BookId where b.Deleted<>0 and b.Blocked<>0 and b.Broken<>0 and a.AvtorId=an.AvtorId) > 0 limit 30";
+	private static final String AUTHOR_SEARCH_QUERY = "select (FirstName || ' ' || LastName) as " + AUTHOR_SEARCH_NAME + ", AvtorId as " + AUTHOR_SEARCH_ID + " from libavtorname an where FirstName like ? and LastName like ? and (select count(*) from libbook b join libavtor a on b.BookId=a.BookId where b.Deleted<>0 and b.Blocked<>0 and b.Broken<>0 and a.AvtorId=an.AvtorId) > 0 limit ";
 	private static final String BOOK_SEARCH_BY_AUTHOR_ID_QUERY = "select b.BookId " + BOOK_SEARCH_ID + ", b.FileSize " + BOOK_SEARCH_SIZE + ", b.Title " + BOOK_SEARCH_TITLE + ", b.Lang " + BOOK_SEARCH_LANG + ", b.FileType " + BOOK_SEARCH_FORMAT + " from libbook b join libavtor a on b.BookId=a.BookId where b.Deleted<>1 and b.Blocked<>1 and b.Broken<>1 and a.AvtorId=";
 	
 	
     private SQLiteDatabase mDb;
-    
+    private Context ctx;
 
     private static final String DATABASE_PATH = Environment.getExternalStorageDirectory() + "/lib.db";
 
@@ -39,6 +40,7 @@ public class DBManager {
      * @param ctx the Context within which to work
      */
     public  DBManager(Context ctx) {
+    	this.ctx = ctx;
     }
 
     /**
@@ -66,7 +68,7 @@ public class DBManager {
     public Cursor getAuthors(Author author) {
     	try {
     		if (author != null) {
-    			Cursor cursor = mDb.rawQuery(AUTHOR_SEARCH_QUERY, new String[] {prepareLIKECondition(author.getFirstName()), prepareLIKECondition(author.getLastName())});
+    			Cursor cursor = mDb.rawQuery(AUTHOR_SEARCH_QUERY + ctx.getString(R.string.author_search_limit), new String[] {prepareLIKECondition(author.getFirstName()), prepareLIKECondition(author.getLastName())});
     			return cursor;
     		}
     	} catch (Exception e) {
