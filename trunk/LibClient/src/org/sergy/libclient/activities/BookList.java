@@ -22,6 +22,11 @@ import android.widget.SimpleCursorAdapter;
 import android.widget.TextView;
 import android.widget.AdapterView.OnItemClickListener;
 
+/**
+ * Activity for loading books list for given author and downloading books
+ * @author sergy
+ *
+ */
 public class BookList extends AbstractListActivity {
 	static final int PROGRESS_DIALOG = 0;
 
@@ -111,7 +116,7 @@ public class BookList extends AbstractListActivity {
 	@Override
 	protected Dialog onCreateDialog(int id) {
 		switch (id) {
-		case PROGRESS_DIALOG:
+		case PROGRESS_DIALOG: //Download progress dialog
 			progressDialog = new ProgressDialog(this);
 			progressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
 			progressDialog.setMessage("Starting");

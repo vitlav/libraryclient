@@ -68,6 +68,7 @@ public class DBManager {
     public Cursor getAuthors(Author author) {
     	try {
     		if (author != null) {
+    			//TODO Change AUTHOR_SEARCH_QUERY. Don't use AUTHOR_SEARCH_QUERY + ctx.getString(R.string.author_search_limit)
     			Cursor cursor = mDb.rawQuery(AUTHOR_SEARCH_QUERY + ctx.getString(R.string.author_search_limit), new String[] {prepareLIKECondition(author.getFirstName()), prepareLIKECondition(author.getLastName())});
     			return cursor;
     		}

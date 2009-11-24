@@ -17,6 +17,11 @@ import android.widget.SimpleCursorAdapter;
 import android.widget.TextView;
 import android.widget.AdapterView.OnItemClickListener;
 
+/**
+ * Presents author search results
+ * @author sergy
+ *
+ */
 public class AuthorList extends AbstractListActivity {
 	public static final String AUTHOR_KEY="author";
 	private Author searchAuthor;
@@ -63,7 +68,7 @@ public class AuthorList extends AbstractListActivity {
 			finish();
 		}
 		
-		if (authorList.getChildCount() == 0) { 
+		if (authorList.getChildCount() == 0) { //if list is empty. Try to search and fill list 
 		
 			showProgressDialog(R.string.searching);
 			
@@ -96,13 +101,17 @@ public class AuthorList extends AbstractListActivity {
 		}
 	}
 	
+	/**
+	 * Executes author search
+	 * @return result count
+	 */
 	private int search() {
 		
 		try {
 			Cursor cursor = dbm.getAuthors(searchAuthor);
 			if (cursor != null) {
 		        startManagingCursor(cursor);
-		        count = cursor.getCount();
+		        count = cursor.getCount(); //need this line to force search process
 			}
 			this.cursor = cursor;
 		} catch (Exception e) {
@@ -112,12 +121,17 @@ public class AuthorList extends AbstractListActivity {
         return count;
 	}
 	
+	/**
+	 * Shows result count in UI
+	 */
 	private void setResultsCount() {
 		TextView resultsCount = (TextView)findViewById(R.id.results_count);
 		resultsCount.setText(String.valueOf(count));
 	}
 	
-	
+	/**
+	 * Fills result list in UI
+	 */
 	private void setListRows() {
 		Cursor cursor = this.cursor;
 		
