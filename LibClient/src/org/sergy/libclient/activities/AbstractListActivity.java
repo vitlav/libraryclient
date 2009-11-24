@@ -5,6 +5,11 @@ import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 
+/**
+ * Abstract class for Author and Book lists
+ * @author sergy
+ *
+ */
 public abstract class AbstractListActivity extends Activity {
 	private ProgressDialog progressDialog;
 	

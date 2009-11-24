@@ -13,6 +13,11 @@ import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.EditText;
 
+/**
+ * First, fake search activity. <br/> Real search is in AuthorList activity
+ * @author sergy
+ *
+ */
 public class AuthorSearch extends Activity {
 	private final static String AUTHOR_KEY = "author";
 	

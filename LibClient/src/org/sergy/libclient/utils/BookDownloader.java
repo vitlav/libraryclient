@@ -20,6 +20,7 @@ public class BookDownloader extends Thread {
 	public final static String KEY_CURRENT = "current";
 	public final static String KEY_MESSAGE = "message";
 	
+	//Donload process states
 	public final static int CONNECTING = 0;
 	public final static int DOWLOADING = 1;
 	public final static int FINISHED = 2;
@@ -33,7 +34,7 @@ public class BookDownloader extends Thread {
 	private final static String LIB_URL = "http://lib.rus.ec/b/";
 	private final static String DIR = "Books";
 	private final static String EXTENSION = "zip";
-	private final static int SLEEP_ON_ERROR = 2000;
+	private final static int SLEEP_ON_ERROR = 2000; //Sleep before exit in error.
 	
 	private String url;
 	private Handler handler;
