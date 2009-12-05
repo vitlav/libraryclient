@@ -1,13 +1,13 @@
 #summary README
+#labels Featured,Phase-Deploy
 
 = Installation =
 
-# Download and unpack [http://libraryclient.googlecode.com/files/lib.db.tar.bz2]
-
+# Download and unpack library database from [http://code.google.com/p/libraryclient/downloads/list Downloads]
 
 # Put lib.db on the root of your external storage folder (/sdcard/)
 
-# Download and install application
+# Download and install application from [http://code.google.com/p/libraryclient/downloads/list Downloads]
 
 # Run it!
 
