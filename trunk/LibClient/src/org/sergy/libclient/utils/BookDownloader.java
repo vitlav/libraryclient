@@ -50,6 +50,7 @@ public class BookDownloader extends Thread {
 		
 		BufferedInputStream in = null;
 		BufferedOutputStream bout = null;
+		FileOutputStream fos = null;
 		HttpURLConnection connection = null;
 		try {
 			URL httpUrl = new URL(url);
@@ -70,7 +71,7 @@ public class BookDownloader extends Thread {
 					File dir = new File(root, DIR);
 					dir.mkdirs();
 					File file = new File(dir, fname);
-					FileOutputStream fos = new FileOutputStream(file);
+					fos = new FileOutputStream(file);
 
 					bout = new BufferedOutputStream(fos, BUF_SIZE);
 					byte data[] = new byte[BUF_SIZE];
@@ -80,7 +81,7 @@ public class BookDownloader extends Thread {
 					sendMessage(DOWLOADING, fname, size, total);
 					
 					while((current = in.read(data,0,BUF_SIZE)) >=0) {
-						bout.write(data);
+						bout.write(data, 0, current);
 						
 						total += current;
 						sendMessage(DOWLOADING, fname, size, total);
@@ -105,6 +106,7 @@ public class BookDownloader extends Thread {
 			if (bout != null) {
 				try {
 					bout.close();
+					fos.close();
 				} catch (IOException e) {
 					sendExceptionMessage(e);
 				}
