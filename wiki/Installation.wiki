@@ -1,6 +1,5 @@
-#summary INSTALLATION
+#summary Installation steps
 #labels Featured,Phase-Deploy
-= Installation =
 
 # Download and unpack library database from [http://code.google.com/p/libraryclient/downloads/list Downloads]
 
