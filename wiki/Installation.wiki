@@ -1,4 +1,4 @@
-#summary Installation steps
+#summary Installation howto
 #labels Featured,Phase-Deploy
 
 # Download and unpack library database from [http://code.google.com/p/libraryclient/downloads/list Downloads]
