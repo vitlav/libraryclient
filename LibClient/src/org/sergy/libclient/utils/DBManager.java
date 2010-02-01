@@ -23,7 +23,7 @@ public class DBManager {
 	public static final String BOOK_SEARCH_FORMAT = "format";
 
 	//Queries
-	private static final String AUTHOR_SEARCH_QUERY = "select (FirstName || ' ' || LastName) as " + AUTHOR_SEARCH_NAME + ", AvtorId as " + AUTHOR_SEARCH_ID + " from libavtorname an where FirstName like ? and LastName like ? and (select count(*) from libbook b join libavtor a on b.BookId=a.BookId where b.Deleted<>0 and b.Blocked<>0 and b.Broken<>0 and a.AvtorId=an.AvtorId) > 0 limit ";
+	private static final String AUTHOR_SEARCH_QUERY = "select (LastName || ' ' || FirstName || ' ' || MiddleName) as " + AUTHOR_SEARCH_NAME + ", AvtorId as " + AUTHOR_SEARCH_ID + " from libavtorname an where FirstName like ? and LastName like ? and (select count(*) from libbook b join libavtor a on b.BookId=a.BookId where a.AvtorId=an.AvtorId) > 0 limit ";
 	private static final String BOOK_SEARCH_BY_AUTHOR_ID_QUERY = "select b.BookId " + BOOK_SEARCH_ID + ", b.FileSize " + BOOK_SEARCH_SIZE + ", b.Title " + BOOK_SEARCH_TITLE + ", b.Lang " + BOOK_SEARCH_LANG + ", b.FileType " + BOOK_SEARCH_FORMAT + " from libbook b join libavtor a on b.BookId=a.BookId where b.Deleted<>1 and b.Blocked<>1 and b.Broken<>1 and a.AvtorId=";
 	
 	
