@@ -3,7 +3,7 @@
     <string name="fname">First name:</string>
     <string name="lname">Last name:</string>
     <string name="search">Search</string>
-    <string name="app_name">LibRusEcClient</string>
+    <string name="app_name">LibraryClient</string>
     <string name="author_search_dialog">Insert at least one search parameter</string>
     <string name="ok">OK</string>
     <string name="no_query_alert">Empty query!</string>
@@ -22,7 +22,7 @@
     <string name="download_finished">Download finished!</string>
     <string name="download_error">Catched exception: </string>
     <string name="download_error_response">Bad server response: </string>
-    <string name="download_error_bad_book">Incorrect file name from server: </string>
+    <string name="download_error_bad_book">Got not *.zip file from server. </string>
     <string name="search_note">Note: search is case sensitive</string>
     <string name="search_limit_note">Maximum result count: </string>
     <string name="author_search_limit">50</string>

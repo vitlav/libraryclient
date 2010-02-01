@@ -31,7 +31,8 @@ public class BookDownloader extends Thread {
 	
 	
 	private final static int BUF_SIZE = 1024 * 10; //kb
-	private final static String LIB_URL = "http://lib.rus.ec/b/";
+	//private final static String LIB_URL = "http://lib.rus.ec/b/";
+	private final static String LIB_URL = "http://flibusta.net/b/";
 	private final static String DIR = "Books";
 	private final static String EXTENSION = "zip";
 	private final static int SLEEP_ON_ERROR = 2000; //Sleep before exit in error.
@@ -88,7 +89,7 @@ public class BookDownloader extends Thread {
 					}
 					
 				} else {
-					sendMessage(ERROR_BAD_FILE_RETURNED, fname, 0, -1);
+					sendMessage(ERROR_BAD_FILE_RETURNED, connection.getURL().toString(), 0, -1);
 					sleep(SLEEP_ON_ERROR);
 				}
 			} else {
