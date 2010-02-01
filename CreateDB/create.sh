@@ -1,25 +1,39 @@
-#!/bin/sh
-rm -f ./lib.db;
-cp original/empty.db ./lib.db;
+#!/bin/bash
 
-for t in libavtorname libavtor libbook;
+files=(libavtorname libavtor libbook b.annotations b.annotations_pics a.annotations a.annotations_pics);
+tables=(libavtorname libavtor libbook libbannotations libbpics libaannotations libapics);
+
+#files=(b.annotations b.annotations_pics a.annotations a.annotations_pics);
+#tables=(libbannotations libbpics libaannotations libapics);
+
+
+rm -f ./lib.db;
+
+sqlite3 lib.db < ./original/dump.sql
+
+for i in ${!files[*]}
 do
 
-echo "DOWNLOADING $t TABLE (MySQL script)";
+t=${files[$i]}
+table=${tables[$i]}
+
+echo "DOWNLOADING $t DUMP (MySQL script)";
 
 rm -f lib.$t.sql.gz;
-wget http://lib.rus.ec/sql/lib.$t.sql.gz;
+wget http://93.174.93.47/sql/lib.$t.sql.gz;
 
-echo "PREPARING $t IMPORT SCRIPT";
+echo "PREPARING $table IMPORT SCRIPT";
+
 rm -f $t.sql;
 rm -f ~tmp.sql;
-regex="s/)\s*,\s*(/);\ninsert into $t values (/g";
+
+regex="s/)\s*,\s*(/);\ninsert into $table values (/g";
 zcat lib.$t.sql.gz | grep INSERT > ~tmp.sql;
 sed "$regex" ~tmp.sql | sed "s/\\\'/''/g" > $t.sql;
 
-echo "IMPORTING $t TABLE. BE PATIENT...";
+echo "IMPORTING $table TABLE. BE PATIENT...";
 sqlite3 lib.db < $t.sql;
-echo "IMPORTED!";
+echo "DONE!";
 
 rm -f $t.sql;
 
@@ -32,4 +46,8 @@ sqlite3 lib.db < ./db_scripts/clean_db.sql;
 rm -f ~tmp.sql;
 
 echo "DONE!";
-echo "Copy lib.db file to your /sdcard folder";
+
+echo "DOWNLOADING IMAGES";
+wget http://93.174.93.47/sql/libattachedfiles.zip
+
+echo "Copy lib.db and libattachedfiles.zip files to your /sdcard folder";
