@@ -1,6 +1,7 @@
 package org.sergy.libclient.utils;
 
 import org.sergy.libclient.activities.R;
+import org.sergy.libclient.model.Annotation;
 import org.sergy.libclient.model.Author;
 
 import android.content.Context;
@@ -91,6 +92,38 @@ public class DBManager {
     	return null;
     }
     
+    public Annotation getAuthorAnnotation(long authorId) {
+    	Annotation result = new Annotation();
+    	String query = "select a.title, a.Body, p.File from libaannotations a left join libapics p on a.AvtorId=p.AvtorId where a.AvtorId=";
+    	try {
+	    	Cursor cursor = mDb.rawQuery(query + String.valueOf(authorId), null);
+	    	if (cursor.moveToFirst()) {
+	    		result.setTitle(cursor.getString(0));
+	    		result.setBody(cursor.getString(1));
+	    		result.setPic(cursor.getString(2));
+	    	}
+	    	cursor.close();
+    	} catch (Exception e) {
+			Log.e(this.getClass().getSimpleName(), e.getClass() + e.getMessage());
+		}
+    	return result;
+    }
+    
+    
+    public int getBooksCount() {
+    	int result = -1;
+    	
+    	String sql = "select count(*) from libavtor";
+    	
+    	Cursor cursor = mDb.rawQuery(sql, null);
+    	
+    	if (cursor.moveToFirst()) {
+    		result = cursor.getInt(0);
+    	}
+    	return result;
+    }
+    
+    
     /**
      * Prepares string for using in LIKE sql condition
      * @param str
@@ -105,19 +138,5 @@ public class DBManager {
     	
     	return result;
     }
-    
-    public int getBooksNumber() {
-    	int result = -1;
-    	
-    	String sql = "select count(*) from libavtor";
-    	
-    	Cursor cursor = mDb.rawQuery(sql, null);
-    	
-    	if (cursor.moveToFirst()) {
-    		result = cursor.getInt(0);
-    	}
-    	return result;
-    }
-    
 
 }
