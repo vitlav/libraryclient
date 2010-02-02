@@ -2,12 +2,14 @@ package org.sergy.libclient.activities;
 
 import java.io.IOException;
 
+import org.sergy.libclient.model.Annotation;
 import org.sergy.libclient.model.Author;
 import org.sergy.libclient.utils.BookDownloader;
 import org.sergy.libclient.utils.DBManager;
 
 import android.app.Dialog;
 import android.app.ProgressDialog;
+import android.content.Intent;
 import android.content.res.Configuration;
 import android.database.Cursor;
 import android.os.Bundle;
@@ -15,7 +17,10 @@ import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.widget.AdapterView;
+import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
@@ -47,6 +52,9 @@ public class BookList extends AbstractListActivity {
 		author = (Author)getIntent().getSerializableExtra(AuthorList.AUTHOR_KEY);
 		handler = new Handler();
 		
+		dbm = new DBManager(this);
+		dbm.open();
+		
 		if (author != null) {
 			TextView header = (TextView)findViewById(R.id.book_header);
 			String headerString = author.getFirstName();
@@ -55,9 +63,24 @@ public class BookList extends AbstractListActivity {
 		
 		bookList = (ListView)findViewById(R.id.book_list);
 		bookList.setOnItemClickListener(new BookItemClickListener());
-		
-		dbm = new DBManager(this);
-		dbm.open();
+		final Annotation annotation = dbm.getAuthorAnnotation(author.getId());
+		Button viewButton = (Button)findViewById(R.id.view_button);
+		if (annotation.getBody() != null) {
+			viewButton.setOnClickListener(new OnClickListener() {
+				@Override
+				public void onClick(View arg0) {
+					Intent i = new Intent(BookList.this, ShowAnnotation.class);
+			        i.putExtra(ShowAnnotation.ANNOTATION_KEY, annotation);
+			        try {
+			        	startActivity(i);
+			        } catch (Exception e) {
+						Log.e(BookList.class.getSimpleName(), e.getClass() + e.getMessage());
+					}
+				}
+			});
+		} else {
+			viewButton.setEnabled(false);
+		}
 	}
 	
 	@Override

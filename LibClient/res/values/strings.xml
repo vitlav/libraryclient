@@ -26,4 +26,6 @@
     <string name="search_note">Note: search is case sensitive</string>
     <string name="search_limit_note">Maximum result count: </string>
     <string name="author_search_limit">50</string>
+    <string name="view_button">View</string>
+    <string name="annotation_not_found">Annotation not found!</string>
 </resources>
