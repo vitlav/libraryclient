@@ -1,4 +1,5 @@
 #summary LibraryClient screenshoots
+#labels Featured,Phase-Design
 
 ==Main search form. Search by author's first or last name:==
 
