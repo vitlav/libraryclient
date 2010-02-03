@@ -1,12 +1,13 @@
 #summary Installation howto
 #labels Featured,Phase-Deploy
 
-# Download and unpack library database from [http://code.google.com/p/libraryclient/downloads/list Downloads]
+*Requirements:* You need OS Android 1.6+ and about 150 Mb free space on external storage
 
-# Put lib.db on the root of your external storage folder (/sdcard/)
-
-# Download and install application from [http://code.google.com/p/libraryclient/downloads/list Downloads]
-
-# Run it!
+Installation:
+  # Download and unpack library database from [http://code.google.com/p/libraryclient/downloads/list Downloads]
+  # Download images archive from [http://flibusta.net/sql/libattachedfiles.zip]
+  # Put _lib.db_ and _libattachedfiles.zip_ on the root of your external storage folder (/sdcard/)
+  # Download and install latest version of application from [http://code.google.com/p/libraryclient/downloads/list Downloads]
+  # Run it!
 
 PS. [http://code.google.com/p/android/issues/detail?id=4101] через цю багу при інсталяції Android попереджає про доступ до Phone calls
