@@ -12,6 +12,7 @@ import android.content.DialogInterface;
  */
 public abstract class AbstractListActivity extends Activity {
 	private ProgressDialog progressDialog;
+	protected boolean listPopulated = false;
 	
 	protected void showProgressDialog(int message) {
 		progressDialog = ProgressDialog.show(this, "", getString(message), true);

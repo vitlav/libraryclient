@@ -31,7 +31,7 @@ public class AuthorList extends AbstractListActivity {
 	private Handler handler;
 	private int count = 0; //found authors
 	private Cursor cursor;
-
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -53,6 +53,7 @@ public class AuthorList extends AbstractListActivity {
 			
 			dbm = new DBManager(this);
 			dbm.open();
+			listPopulated = false;
 		} catch (Exception e) {
 			Log.e(this.getClass().toString(), e.getClass().toString() + ": " + e.getMessage());
 		}	
@@ -68,7 +69,7 @@ public class AuthorList extends AbstractListActivity {
 			finish();
 		}
 		
-		if (authorList.getChildCount() == 0) { //if list is empty. Try to search and fill list 
+		if (!listPopulated) { //if list is empty. Try to search and fill list 
 		
 			showProgressDialog(R.string.searching);
 			
@@ -87,6 +88,7 @@ public class AuthorList extends AbstractListActivity {
 									setListRows();
 									setResultsCount();
 									hideProgressDialog();
+									listPopulated = true;
 								} catch (Exception e) {
 									e.printStackTrace();
 								}

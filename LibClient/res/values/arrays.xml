@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+	<array name="bookOptions">
+		<item>Download</item>
+		<item>View annotation</item>
+		<item>Back</item>
+	</array>
+</resources>
