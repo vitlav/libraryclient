@@ -7,8 +7,10 @@ import org.sergy.libclient.model.Author;
 import org.sergy.libclient.utils.BookDownloader;
 import org.sergy.libclient.utils.DBManager;
 
+import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.ProgressDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.database.Cursor;
@@ -20,7 +22,6 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.AdapterView;
 import android.widget.Button;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
@@ -41,6 +42,7 @@ public class BookList extends AbstractListActivity {
 	private int count;
 	private Cursor cursor;
 	private Handler handler;
+	private String[] bookOptions;
 	
 	private ProgressDialog progressDialog;
 	
@@ -51,6 +53,8 @@ public class BookList extends AbstractListActivity {
 		
 		author = (Author)getIntent().getSerializableExtra(AuthorList.AUTHOR_KEY);
 		handler = new Handler();
+		
+		bookOptions = getResources().getStringArray(R.array.bookOptions);
 		
 		dbm = new DBManager(this);
 		dbm.open();
@@ -69,18 +73,13 @@ public class BookList extends AbstractListActivity {
 			viewButton.setOnClickListener(new OnClickListener() {
 				@Override
 				public void onClick(View arg0) {
-					Intent i = new Intent(BookList.this, ShowAnnotation.class);
-			        i.putExtra(ShowAnnotation.ANNOTATION_KEY, annotation);
-			        try {
-			        	startActivity(i);
-			        } catch (Exception e) {
-						Log.e(BookList.class.getSimpleName(), e.getClass() + e.getMessage());
-					}
+					startShowAnnotation(annotation);
 				}
 			});
 		} else {
 			viewButton.setEnabled(false);
 		}
+		listPopulated = false;
 	}
 	
 	@Override
@@ -94,34 +93,35 @@ public class BookList extends AbstractListActivity {
 			return;
 		}
 		
-		showProgressDialog(R.string.loading);
-		
-		//Start searching
-		new Thread(new Runnable() {
-	        @Override
-	        public void run() {
-	        	try {
-	        		search();
-	        		
-	        		//Using Handler for correct work of UI elements
-					handler.post(new Runnable() {
-						@Override
-						public void run() {
-							try {
-								setListRows();
-								setResultsCount();
-								hideProgressDialog();
-							} catch (Exception e) {
-								e.printStackTrace();
+		if (!listPopulated) {
+			showProgressDialog(R.string.loading);
+			//Start searching
+			new Thread(new Runnable() {
+		        @Override
+		        public void run() {
+		        	try {
+		        		search();
+		        		
+		        		//Using Handler for correct work of UI elements
+						handler.post(new Runnable() {
+							@Override
+							public void run() {
+								try {
+									setListRows();
+									setResultsCount();
+									hideProgressDialog();
+								} catch (Exception e) {
+									e.printStackTrace();
+								}
 							}
-						}
-					});
-	        		
-				} catch (Exception e) {
-					Log.e(BookList.this.getClass().toString(), e.getClass() + ": " + e.getMessage());
-				}
-	        }
-		}).start();
+						});
+		        		
+					} catch (Exception e) {
+						Log.e(BookList.this.getClass().toString(), e.getClass() + ": " + e.getMessage());
+					}
+		        }
+			}).start();
+		}
 	}
 	
 	@Override
@@ -199,19 +199,58 @@ public class BookList extends AbstractListActivity {
 		}
 	}
 	
+	private void startShowAnnotation(Annotation annotation) {
+		Intent i = new Intent(BookList.this, ShowAnnotation.class);
+        i.putExtra(ShowAnnotation.ANNOTATION_KEY, annotation);
+        try {
+        	startActivity(i);
+        } catch (Exception e) {
+			Log.e(BookList.class.getSimpleName(), e.getClass() + e.getMessage());
+		}
+	}
+	
+	private void downloadBook(long id, String format) {
+		try {
+			BookDownloader bookDownloader = new BookDownloader(id, format, downloadHandler);
+			showDialog(BookList.PROGRESS_DIALOG);
+			bookDownloader.start();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+	
 	private class BookItemClickListener implements OnItemClickListener {
 
 		@Override
-		public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+		public void onItemClick(AdapterView<?> parent, View view, int position, final long id) {
 			LinearLayout layout = (LinearLayout)view;
-			TextView format = (TextView)layout.findViewById(R.id.book_format);
-			try {
-				BookDownloader bookDownloader = new BookDownloader(id, format.getText().toString(), downloadHandler);
-				showDialog(BookList.PROGRESS_DIALOG);
-				bookDownloader.start();
-			} catch (IOException e) {
-				e.printStackTrace();
+			final TextView format = (TextView)layout.findViewById(R.id.book_format);
+			CharSequence bookName = ((TextView)layout.findViewById(R.id.book_title)).getText();
+			final Annotation annotation = dbm.getBookAnnotation(id);
+			String[] dialogItems = null;
+			if (annotation.getBody() != null) {
+				dialogItems = bookOptions;
+			} else {
+				dialogItems = new String[]{bookOptions[0], bookOptions[2]};
 			}
+			AlertDialog.Builder builder = new AlertDialog.Builder(BookList.this);
+			builder.setTitle(bookName);
+			builder.setItems(dialogItems, new DialogInterface.OnClickListener() {
+			    public void onClick(DialogInterface dialog, int item) {
+			    	switch(item) {
+			    	case 0:
+			    		downloadBook(id, format.getText().toString());
+			    		break;
+			    	case 1:
+			    		if (annotation.getBody() != null) {
+			    			startShowAnnotation(annotation);
+			    		}
+			    		break;
+			    	}
+			    }
+			});
+			AlertDialog alert = builder.create();
+			alert.show();
 		}
 		
 	}

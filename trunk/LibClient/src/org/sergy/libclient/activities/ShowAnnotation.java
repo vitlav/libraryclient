@@ -66,7 +66,7 @@ public class ShowAnnotation extends Activity {
 		
 		String body = annotation.getBody();
 		if (body != null) {
-			body = body.replace("\\r\\n", "<br/>").replace("\\\"","\"");
+			body = body.replace("\\r\\n", "<br/>").replace("\\n\\n", "<br/>").replace("\\n", "<br/>").replace("\\\"","\"");
 			body = body.replace("[b]", "<b>").replace("[/b]", "</b>");
 		} else {
 			body = getString(R.string.annotation_not_found);

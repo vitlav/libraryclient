@@ -109,6 +109,22 @@ public class DBManager {
     	return result;
     }
     
+    public Annotation getBookAnnotation(long bookId) {
+    	Annotation result = new Annotation();
+    	String query = "select b.title, b.Body, p.File from libbannotations b left join libbpics p on b.BookId=p.BookId where b.BookId=";
+    	try {
+	    	Cursor cursor = mDb.rawQuery(query + String.valueOf(bookId), null);
+	    	if (cursor.moveToFirst()) {
+	    		result.setTitle(cursor.getString(0));
+	    		result.setBody(cursor.getString(1));
+	    		result.setPic(cursor.getString(2));
+	    	}
+	    	cursor.close();
+    	} catch (Exception e) {
+			Log.e(this.getClass().getSimpleName(), e.getClass() + e.getMessage());
+		}
+    	return result;
+    }
     
     public int getBooksCount() {
     	int result = -1;
